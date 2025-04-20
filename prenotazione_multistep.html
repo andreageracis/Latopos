@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prenotazione - Lato Positivo Café</title>
+  <style>
+    body, html { margin:0; padding:0; font-family:'Lora', serif; background:#f7f7f7; }
+    .header { display:flex; justify-content:space-between; align-items:center; padding:20px; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .header h1 { margin:0; font-size:1.2rem; }
+    .lang-switcher button { background:transparent; border:none; font-size:1rem; margin-left:10px; cursor:pointer; }
+    .lang-switcher button.active { text-decoration:underline; }
+    .stepper { display:flex; margin:20px; }
+    .step { flex:1; height:5px; background:#ddd; margin:0 5px; border-radius:2px; overflow:hidden; }
+    .step.active { background:linear-gradient(45deg,#ff416c,#ff4b2b); }
+    .content { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+    .section { display:none; }
+    .section.active { display:block; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(60px,1fr)); gap:10px; }
+    .grid button { padding:15px; background:#fff; border:1px solid #ccc; border-radius:6px; cursor:pointer; transition:background .2s; }
+    .grid button:hover, .grid button.selected { background:#ff4b2b; color:#fff; border-color:#ff4b2b; }
+    .calendar { margin-top:20px; }
+    .calendar-header { display:flex; justify-content:space-between; align-items:center; }
+    .calendar-header button { background:transparent; border:none; font-size:1.2rem; cursor:pointer; }
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:10px; }
+    .calendar-grid div { text-align:center; padding:10px; cursor:pointer; border-radius:4px; }
+    .calendar-grid div.disabled { color:#aaa; cursor:default; }
+    .calendar-grid div.selected { background:#005fa3; color:#fff; }
+    /* Day selector bar */
+    .day-bar { display:flex; overflow-x:auto; margin-top:20px; padding:5px 0; gap:8px; }
+    .day-bar button { flex:0 0 auto; background:transparent; border:none; border-radius:4px; padding:8px 12px; cursor:pointer; transition:background .2s; }
+    .day-bar button.selected { background:#005fa3; color:#fff; }
+    .time-grid { margin-top:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .time-grid button { padding:10px; border:1px solid #ccc; border-radius:6px; background:#fff; cursor:pointer; transition:background .2s; }
+    .time-grid button:hover, .time-grid button.selected { background:#005fa3; color:#fff; border-color:#005fa3; }
+    .actions { text-align:right; margin-top:20px; }
+    .actions button { padding:10px 20px; border:none; background:#ff416c; color:#fff; border-radius:6px; cursor:pointer; transition:opacity .2s; }
+    .actions button:disabled { opacity:0.5; cursor:default; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 id="headerTitle">Lato Positivo</h1>
+    <div class="lang-switcher">
+      <button id="btn-it">IT</button>
+      <button id="btn-en">EN</button>
+    </div>
+  </div>
+  <div class="stepper">
+    <div class="step active"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+    <div class="step"></div>
+  </div>
+  <div class="content">
+    <!-- Step 1: Guests -->
+    <div class="section active" id="step1">
+      <h2 id="labelGuests">Seleziona numero di ospiti</h2>
+      <div class="grid" id="guestsGrid"></div>
+    </div>
+    <!-- Step 2: Calendar -->
+    <div class="section" id="step2">
+      <h2 id="labelDate">Seleziona data</h2>
+      <div class="calendar">
+        <div class="calendar-header">
+          <button id="prevMonth">&#10094;</button>
+          <div id="monthLabel"></div>
+          <button id="nextMonth">&#10095;</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+      <div class="actions">
+        <button id="back2">Indietro</button>
+      </div>
+    </div>
+    <!-- Step 3: Time with Day Bar -->
+    <div class="section" id="step3">
+      <div class="day-bar" id="dayBar"></div>
+      <h2 id="labelTime">Seleziona orario</h2>
+      <div class="time-grid" id="timesGrid"></div>
+      <div class="actions">
+        <button id="back3">Indietro</button>
+      </div>
+    </div>
+    <!-- Step 4: Confirm -->
+    <div class="section" id="step4">
+      <h2 id="labelConfirm">Conferma prenotazione</h2>
+      <p id="summary"></p>
+      <div class="actions">
+        <button id="back4">Indietro</button>
+        <button id="confirm">Invia</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Multilanguage
+    const texts = {
+      it:{guests:'Seleziona numero di ospiti',date:'Seleziona data',time:'Seleziona orario',confirm:'Conferma prenotazione',back:'Indietro',send:'Invia'},
+      en:{guests:'Select number of guests',date:'Select date',time:'Select time',confirm:'Confirm reservation',back:'Back',send:'Send'}
+    };
+    let lang=localStorage.getItem('lang')||'it';
+    const btnIT=document.getElementById('btn-it'),btnEN=document.getElementById('btn-en');
+    function applyLang(){
+      document.getElementById('labelGuests').innerText=texts[lang].guests;
+      document.getElementById('labelDate').innerText=texts[lang].date;
+      document.getElementById('labelTime').innerText=texts[lang].time;
+      document.getElementById('labelConfirm').innerText=texts[lang].confirm;
+      ['back2','back3','back4'].forEach(id=>document.getElementById(id).innerText=texts[lang].back);
+      document.getElementById('confirm').innerText=texts[lang].send;
+      btnIT.classList.toggle('active',lang==='it'); btnEN.classList.toggle('active',lang==='en');
+      renderCalendar(); renderDayBar(); renderTimes();
+    }
+    btnIT.addEventListener('click',()=>{lang='it';localStorage.setItem('lang',lang);applyLang();});
+    btnEN.addEventListener('click',()=>{lang='en';localStorage.setItem('lang',lang);applyLang();});// Stepper
+const steps=[...document.querySelectorAll('.step')];
+function goStep(n){
+  document.querySelectorAll('.section').forEach((sec,i)=>sec.classList.toggle('active',i+1===n));
+  steps.forEach((s,i)=>s.classList.toggle('active',i<n));
+  if(n===4) document.getElementById('summary').innerText=
+    `Ospiti: ${selectedGuests}, Data: ${selectedDate.toLocaleDateString(lang)}, Orario: ${selectedTime}`;
+}
+
+// Step1: Guests
+const guestsGrid=document.getElementById('guestsGrid');
+let selectedGuests, selectedDate, selectedTime;
+for(let i=1;i<=14;i++){ const b=document.createElement('button'); b.textContent=i;
+  b.addEventListener('click',()=>{ selectedGuests=i; document.querySelectorAll('#guestsGrid button').forEach(x=>x.classList.remove('selected')); b.classList.add('selected');
+    // init selectedDate to today
+    selectedDate=new Date(); renderDayBar(); renderTimes(); goStep(2);
+  }); guestsGrid.appendChild(b);
+}
+
+// Step2: Calendar
+const monthLabel=document.getElementById('monthLabel'), calendarGrid=document.getElementById('calendarGrid');
+let today=new Date(), viewMonth=today.getMonth(), viewYear=today.getFullYear();
+function renderCalendar(){ calendarGrid.innerHTML=''; monthLabel.innerText=new Intl.DateTimeFormat(lang,{month:'long',year:'numeric'}).format(new Date(viewYear,viewMonth));
+  const firstDay=new Date(viewYear,viewMonth,1).getDay(), days=new Date(viewYear,viewMonth+1,0).getDate();
+  for(let i=1;i<=(firstDay||7)-1;i++){ let d=document.createElement('div'); d.classList.add('disabled'); calendarGrid.appendChild(d); }
+  for(let d=1;d<=days;d++){ let c=document.createElement('div'), dt=new Date(viewYear,viewMonth,d);
+    if(dt<today||dt.getDay()===1) c.classList.add('disabled'); c.innerText=d;
+    c.addEventListener('click',()=>{ if(!c.classList.contains('disabled')){ selectedDate=new Date(dt); renderDayBar(); renderTimes(); goStep(3);} });
+    calendarGrid.appendChild(c);
+  }
+}
+document.getElementById('prevMonth').addEventListener('click',()=>{ viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--;} applyLang(); });
+document.getElementById('nextMonth').addEventListener('click',()=>{ viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++;} applyLang(); });
+
+// Step3: Day Bar
+const dayBar=document.getElementById('dayBar');
+function renderDayBar(){ dayBar.innerHTML=''; if(!selectedDate) return; 
+  // show 7 days centered on selectedDate
+  for(let offset=-3;offset<=3;offset++){ let dt=new Date(selectedDate); dt.setDate(selectedDate.getDate()+offset);
+    let btn=document.createElement('button');
+    btn.innerText=new Intl.DateTimeFormat(lang,{weekday:'short',day:'numeric'}).format(dt);
+    if(dt.toDateString()===selectedDate.toDateString()) btn.classList.add('selected');
+    btn.addEventListener('click',()=>{ selectedDate=new Date(dt); renderDayBar(); renderTimes(); });
+    dayBar.appendChild(btn);
+  }
+}
+
+// Step3: Times
+const timesGrid=document.getElementById('timesGrid');
+function renderTimes(){ timesGrid.innerHTML=''; if(!selectedDate) return;
+  const openH=17, closeH=25;
+  for(let h=openH;h<closeH;h++){
+    for(let m=0;m<60;m+=15){
+      let btn=document.createElement('button');
+      let label=`${String(h%24).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      btn.innerText=label;
+      btn.addEventListener('click',()=>{ selectedTime=label; document.querySelectorAll('.time-grid button').forEach(x=>x.classList.remove('selected')); btn.classList.add('selected'); goStep(4); });
+      timesGrid.appendChild(btn);
+    }
+  }
+}
+
+// Back
+document.getElementById('back2').addEventListener('click',()=>goStep(1));
+document.getElementById('back3').addEventListener('click',()=>goStep(2));
+document.getElementById('back4').addEventListener('click',()=>goStep(3));
+
+// Confirm
+document.getElementById('confirm').addEventListener('click',()=>{
+  let msg=`Prenotazione ${selectedGuests} persone il ${selectedDate.toLocaleDateString(lang)} alle ${selectedTime}`;
+  window.location.href=`https://wa.me/3903515860294?text=${encodeURIComponent(msg)}`;
+});
+
+// Init
+applyLang();
+renderCalendar();
+
+  </script>
+</body>
+</html>

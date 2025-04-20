@@ -1,0 +1,242 @@
+/* style.css */
+/* Stile elegante e armonico per Lato Positivo */
+
+/* Reset base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Lora', serif;
+  overflow-x: hidden;
+  background-color: transparent;
+}
+
+/* Titoli in grassetto per contrasto */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+/* Video background multipli con dissolvenza */
+.video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+.video-bg.active {
+  opacity: 1;
+}
+
+/* Header con logo e frase */
+.site-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 30px 20px 10px 20px;
+  gap: 10px;
+}
+.site-header .logo {
+  width: 110px;
+  height: auto;
+}
+.site-header .logo-subtitle {
+  color: #fff;
+  line-height: 1.3;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeSlideIn 1.5s ease forwards;
+  max-width: 90%;
+}
+.site-header .logo-subtitle span {
+  display: block;
+  text-align: left;
+}
+.site-header .logo-subtitle .line1 { font-size: 1.5rem; }
+.site-header .logo-subtitle .line2 { font-size: 1.2rem; }
+.site-header .logo-subtitle .line3 { font-size: 1rem; }
+
+@media (max-width: 600px) {
+  .site-header .logo { width: 160px; }
+  .site-header .logo-subtitle .line1 { font-size: 1.3rem; }
+  .site-header .logo-subtitle .line2 { font-size: 1.1rem; }
+  .site-header .logo-subtitle .line3 { font-size: 0.95rem; }
+}
+
+/* Hero section */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  padding: 10px 20px 0;
+  background: transparent;
+}
+.content h1 {
+  color: #fff;
+  font-size: 2.3rem;
+  line-height: 1.3;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+  max-width: 90%;
+}
+
+/* Panels */
+.panels {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 30px 20px;
+  flex-wrap: nowrap;
+  background: transparent;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+.panel {
+  flex: 1 1 0;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: transform 0.3s, opacity 0.3s, flex 0.3s ease;
+  min-width: 130px;
+  max-width: 200px;
+  padding: 18px 10px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 2;
+}
+.panel.open {
+  flex: 1 1 100%;
+  max-width: 100%;
+  min-width: 100%;
+  z-index: 5;
+}
+.panel:hover { transform: scale(1.05); }
+.panel.hidden { display: none; }
+.panel .material-icons { font-size: 2.2rem; margin-bottom: 8px; }
+
+/* Panel content */
+.panel-content {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  opacity: 0;
+  transition: max-height 0.6s ease, padding 0.6s ease, opacity 0.6s ease;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  margin: 10px auto 0;
+  width: 100%;
+  max-width: none;
+  color: #fff;
+  display: block;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+}
+.panel.open .panel-content {
+  padding: 20px;
+  max-height: 90vh;
+  opacity: 1;
+  overflow-y: auto;
+}
+
+/* Form elements in panels */
+.panel-content input,
+.panel-content select,
+.panel-content textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  color: #333;
+  background: rgba(255,255,255,0.9);
+  box-sizing: border-box;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.form-buttons button {
+  flex: 1 1 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: 'Lora', serif;
+}
+.form-buttons button:hover { background: #ddd; }
+
+/* Scopri i nostri drink */
+.discover-drinks {
+  text-align: center;
+  margin: 40px 0;
+}
+#discover-button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: 'Lora', serif;
+}
+#discover-button:hover {
+  background: #ddd;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .panels {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .panel { flex: 0 0 auto; }
+  .form-buttons button { font-size: 0.9rem; padding: 10px; }
+}
+
+/* Animazioni */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideIn {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

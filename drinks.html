@@ -1,0 +1,148 @@
+<!DOCTYPE html><html lang="it"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scopri i nostri drink - Lato Positivo Café</title>
+  <!-- Google Font Lora -->
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Material Icons and Font Awesome -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body, html { margin:0; padding:0; background:#000; color:#fff; font-family:'Lora', serif; }
+    .top-bar {
+      position:fixed; top:0; left:0; width:100%; display:flex;
+      justify-content:space-between; align-items:center;
+      padding:15px; background:rgba(0,0,0,0.8); z-index:1000;
+    }
+    .logo-btn { font-weight:700; font-size:1.5rem; color:#fff; text-decoration:none; }
+    .controls { display:flex; align-items:center; gap:10px; }
+    .lang-switcher button { background:transparent; border:none; color:#fff; font-size:1rem; cursor:pointer; padding:0; }
+    .lang-switcher button.active, .lang-switcher button:hover { text-decoration:underline; }
+    .menu-toggle { background:transparent; border:none; cursor:pointer; color:#fff; font-size:28px; margin-right:20px; }
+    .fullscreen-menu {
+      position:fixed; top:0; left:0; width:100vw; height:100vh;
+      background:rgba(0,0,0,0.9); display:none;
+      flex-direction:column; justify-content:center; align-items:center;
+      z-index:1001;
+    }
+    .fullscreen-menu.show { display:flex; }
+    .fullscreen-menu .close-menu { position:absolute; top:20px; right:20px; font-size:32px; color:#fff; cursor:pointer; }
+    .fullscreen-menu a { color:#fff; text-decoration:none; font-size:1.8rem; padding:10px 0; transition:color 0.3s ease; }
+    .fullscreen-menu a:hover, .fullscreen-menu a.clicked { color:gold; }
+    .fullscreen-menu a.active-page { color:#ff416c; }
+    .content { padding:100px 20px 20px; }
+    .drink-card {
+      position:relative;
+      margin-bottom:20px;
+      cursor:pointer;
+    }
+    .drink-card img {
+      width:100%; border-radius:8px;
+      transition:filter 0.3s;
+      display:block;
+    }
+    .drink-card.active img {
+      filter: blur(5px);
+    }
+    .drink-card .details {
+      position:absolute;
+      top:0; left:0; width:100%; height:100%;
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      color:#fff; text-align:center;
+      background:rgba(0,0,0,0.6);
+      opacity:0; transition:opacity 0.3s;
+      padding:20px;
+      box-sizing:border-box;
+      border-radius:8px;
+    }
+    .drink-card.active .details {
+      opacity:1;
+    }
+    .details h3 { margin:0 0 10px; font-size:1.5rem; }
+    .details p { margin:5px 0; }
+    .details p.price { font-weight:bold; margin-top:10px; }
+    .info-section { background:#000; padding:40px 20px; }
+    .info-block { max-width:800px; margin:20px auto; text-align:center; }
+    .info-block h2 { font-size:1.8rem; margin-bottom:10px; }
+    .info-block p { margin:4px 0; font-size:1rem; color:#ccc; }
+    .social-icons { text-align:center; padding:20px 0; }
+    .social-icons a { color:#fff; margin:0 15px; font-size:2rem; transition:color 0.3s ease; }
+    .social-icons a:hover { color:#ff416c; }
+    .site-footer { background:#111; color:#ccc; text-align:center; padding:20px 10px; }
+    .site-footer nav a { color:#ccc; text-decoration:underline; margin:0 8px; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="logo-btn">LP</a>
+    <div class="controls">
+      <div class="lang-switcher">
+        <button id="btn-it">IT</button>
+        <button id="btn-en">EN</button>
+      </div>
+      <button class="menu-toggle" onclick="toggleMenu()"><span class="material-icons">menu</span></button>
+    </div>
+  </div>
+  <div class="fullscreen-menu" id="fullscreenMenu">
+    <span class="material-icons close-menu" onclick="toggleMenu()">close</span>
+    <a href="index.html" onclick="toggleMenu()">Home</a>
+    <a href="cocktailbar.html" onclick="toggleMenu()">Cocktail Bar</a>
+    <a href="prenotazione.html" onclick="toggleMenu()">Prenota</a>
+    <a href="contatti.html" onclick="toggleMenu()">Contatti</a>
+  </div>
+  <div class="content">
+    <!-- Static drink cards -->
+    <div class="drink-card" onclick="this.classList.toggle('active')">
+      <img src="video/drink1.jpg" alt="Spritz Sunset">
+      <div class="details">
+        <h3>Spritz Sunset</h3>
+        <p>Fresco e fruttato con un tocco agrumato.</p>
+        <p class="price">€5.00</p>
+      </div>
+    </div>
+    <div class="drink-card" onclick="this.classList.toggle('active')">
+      <img src="video/drink2.jpg" alt="Negroni Classico">
+      <div class="details">
+        <h3>Negroni Classico</h3>
+        <p>Il perfetto equilibrio tra gin, vermouth e Campari.</p>
+        <p class="price">€7.50</p>
+      </div>
+    </div>
+    <div class="drink-card" onclick="this.classList.toggle('active')">
+      <img src="video/drink3.jpg" alt="Boulevardier">
+      <div class="details">
+        <h3>Boulevardier</h3>
+        <p>Il perfetto equilibrio tra whisky, vermouth e Campari.</p>
+        <p class="price">€7.50</p>
+      </div>
+    </div>
+  </div>
+  <div class="info-section">
+    <div class="info-block">
+      <h2>Indirizzo</h2>
+      <p>Via Tripoli 11, 10135 Torino (TO)</p>
+    </div>
+    <div class="info-block">
+      <h2>Orari</h2>
+      <p>Lunedì-Giovedì: 17:30 - 01:30<br>Venerdì-Sabato: 17:30 - 02:30<br>Domenica: 16:00 - 01:00</p>
+    </div>
+  </div>
+  <div class="social-icons">
+    <a href="https://www.instagram.com/latopositivococktailshouse" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="https://www.tiktok.com/@latopositivococktails" target="_blank"><i class="fab fa-tiktok"></i></a>
+  </div>
+  <footer class="site-footer">
+    <p>© 2025 Lato Positivo Café | Via Tripoli 11, 10135 Torino | P.IVA 12345678901</p>
+    <nav>
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="cookie.html">Cookie Policy</a>
+    </nav>
+  </footer>
+  <script>
+    function toggleMenu(){ document.getElementById('fullscreenMenu').classList.toggle('show'); }
+    // Language switcher stub
+    document.getElementById('btn-it').addEventListener('click', ()=>{});
+    document.getElementById('btn-en').addEventListener('click', ()=>{});
+  </script>
+</body>
+</html>

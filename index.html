@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lato Positivo Café</title>
+  <!-- Font e icone -->
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/style.css" />
+  <style>
+    body, html { margin:0; padding:0; font-family:'Lora', serif; }
+    /* Rimuovi evidenziazione */
+    img.logo, .menu-toggle, .btn-book, .social-icons a { -webkit-tap-highlight-color: transparent; outline: none; }
+    /* Video background */
+    .video-section { position: relative; height:100vh; overflow:hidden; }
+    .video-bg { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0; transition: opacity 1s ease; }
+    .video-bg.active { opacity:1; }
+    /* Overlay logo */
+    .video-overlay { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; z-index:2; }
+    .video-overlay .logo { width:200px; opacity:0; transition:opacity 1s ease; cursor:pointer; }
+    .video-overlay .logo.visible { opacity:1; }
+    /* Prenota ora */
+    .book-section { background:#000; text-align:center; padding:40px 0; }
+    .book-section .btn-book { padding:15px 40px; font-size:1.2rem; border:none; background: linear-gradient(45deg, #ff416c, #ff4b2b); color:#fff; backdrop-filter: blur(4px); cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; border-radius: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+    .book-section .btn-book:hover { background: linear-gradient(45deg, #ff4b2b, #ff416c); transform: scale(1.05); }
+    /* Menu fullscreen: icona bianca senza sfondo */
+    .menu-toggle { position:absolute; top:20px; right:20px; background: transparent; padding:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:1001; }
+    .menu-toggle span { font-size:28px; color:white; }
+    .fullscreen-menu { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); display:none; flex-direction:column; justify-content:center; align-items:center; z-index:1000; }
+    .fullscreen-menu.show { display:flex; }
+    .fullscreen-menu a { color:white; text-decoration:none; font-size:1.8rem; padding:10px 0; transition:color 0.3s ease; }
+    .fullscreen-menu a:hover { text-decoration:underline; }
+    .fullscreen-menu a.clicked { color:gold; }
+    .close-menu { position:absolute; top:20px; right:20px; font-size:32px; color:white; cursor:pointer; }
+    /* Info section */
+    .info-section { background:#000; color:#fff; padding:60px 20px; }
+    .info-block { max-width:800px; margin:auto; text-align:center; margin-bottom:40px; }
+    .info-block h2 { font-size:1.8rem; margin-bottom:10px; }
+    .info-block p { margin:4px 0; font-size:1rem; }
+    /* Social icons */
+    .social-icons { text-align:center; padding:20px 0; background:#111; }
+    .social-icons a { color:#fff; margin:0 15px; font-size:2rem; transition: color 0.3s ease; }
+    .social-icons a:hover { color:#ff416c; }
+    /* Footer */
+    .site-footer { background:#111; color:#ccc; text-align:center; padding:20px 10px; }
+  </style>
+</head>
+<body>
+  <div class="menu-toggle" onclick="toggleMenu()"><span class="material-icons">menu</span></div>
+  <div class="fullscreen-menu" id="fullscreenMenu">
+    <span class="close-menu" onclick="toggleMenu()">&times;</span>
+    <a href="cocktailbar.html" onclick="toggleMenu()">Cocktail bar</a>
+    <a href="contatti.html" onclick="animateClick(this)">Contatti</a>
+  </div>
+  <div class="video-section">
+    <video class="video-bg active" id="bg1" muted playsinline>
+      <source src="video/background1.mp4" type="video/mp4" />
+    </video>
+    <video class="video-bg" id="bg2" muted playsinline>
+      <source src="video/background2.mp4" type="video/mp4" />
+    </video>
+    <video class="video-bg" id="bg3" muted playsinline>
+      <source src="video/background3.mp4" type="video/mp4" />
+    </video>
+    <div class="video-overlay">
+      <img src="video/logo.png" alt="Lato Positivo Logo" class="logo" id="mainLogo" />
+    </div>
+  </div>
+  <div class="book-section">
+    <button class="btn-book" id="btnBook" onclick="window.location.href='prenotazione.html'">Prenota ora</button>
+  </div>
+  <div class="info-section" id="infoSection">
+    <div class="info-block" id="address">
+      <h2>Indirizzo</h2>
+      <p>Lato Positivo Café</p>
+      <p>Via Tripoli 11, Torino 10135</p>
+      <p>Tel: 351 586 0294 | Email: latopositivocafe@gmail.com</p>
+    </div>
+    <div class="info-block" id="hours">
+      <h2>Orari</h2>
+      <p>Lunedì-Giovedì: 17:30 - 01:30</p>
+      <p>Venerdì-Sabato: 17:30 - 02:30</p>
+      <p>Domenica: 16:00 - 01:00</p>
+    </div>
+  </div>
+  <div class="social-icons">
+    <a href="https://www.instagram.com/latopositivococktailshouse" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+    <a href="https://www.tiktok.com/@latopositivococktails" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+  </div>
+  <footer class="site-footer">
+    <p style="margin:0; font-size:0.9rem;">© 2025 Lato Positivo Café | Via Tripoli 11, 10135 Torino | P.IVA 12345678901</p>
+    <nav><a href="/privacy.html">Privacy Policy</a> | <a href="/cookie.html">Cookie Policy</a></nav>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+    const videos = [document.getElementById('bg1'),document.getElementById('bg2'),document.getElementById('bg3')];
+    videos.forEach((video,i)=>{video.addEventListener('ended',()=>{video.classList.remove('active');const next=videos[(i+1)%videos.length];next.classList.add('active');next.currentTime=0;next.play();});});videos[0].play();
+    document.addEventListener('DOMContentLoaded',()=>{const logo=document.getElementById('mainLogo');setTimeout(()=>logo.classList.add('visible'),100);
+      let clickCount=0,clickTimer;logo.addEventListener('click',()=>{clickCount++;if(clickCount===3)window.location.href='admin.html';clearTimeout(clickTimer);clickTimer=setTimeout(()=>clickCount=0,2000);});
+      let pressTimer;logo.addEventListener('touchstart',()=>{pressTimer=setTimeout(()=>window.location.href='admin.html',1500);});logo.addEventListener('touchend',()=>{clearTimeout(pressTimer);});
+      const btnBook=document.getElementById('btnBook');btnBook.addEventListener('click',()=>{btnBook.style.transform='scale(1.05)';setTimeout(()=>btnBook.style.transform='',200);window.location.href='prenotazione.html';});
+    });
+    function toggleMenu(){document.getElementById('fullscreenMenu').classList.toggle('show');}
+    function animateClick(el){el.classList.add('clicked');setTimeout(()=>el.classList.remove('clicked'),300);}
+    window.addEventListener('scroll',()=>{const infoTop=document.getElementById('infoSection').offsetTop;document.body.style.background=window.scrollY>infoTop-window.innerHeight/2?'#000':'';});
+  </script>
+</body>
+</html>

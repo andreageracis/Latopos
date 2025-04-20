@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Lato Positivo Café</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, textarea, button { display: block; width: 100%; margin: 10px 0; padding: 10px; font-size: 1rem; }
+    #menu-list div { background: #f0f0f0; margin-bottom: 10px; padding: 10px; }
+    img { margin-top: 10px; max-width: 100px; display: block; }
+  </style>
+</head>
+<body>
+  <div id="login-section">
+    <h1>Accesso Admin</h1>
+    <input type="password" id="admin-password" placeholder="Inserisci password" />
+    <button onclick="checkPassword()">Entra</button>
+  </div>
+
+  <div id="admin-panel" style="display:none;">
+    <h1>Admin Lato Positivo</h1>
+    <form id="add-form">
+      <input type="text" name="nome" placeholder="Nome cocktail" required />
+      <textarea name="descrizione" placeholder="Descrizione" required></textarea>
+      <input type="number" step="0.01" name="prezzo" placeholder="Prezzo" required />
+      <input type="file" id="immagineFile" accept="image/*" />
+      <button type="submit">Aggiungi</button>
+    </form>
+    <div id="menu-list"></div>
+  </div>
+
+  <script type="module">
+    // 1. Import SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref as dbRef, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+    // 2. La tua configurazione Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCs6CFgyXyV6B9y9kgJOmsLCIHl2y3NhfE",
+      authDomain: "lato-positivo.firebaseapp.com",
+      databaseURL: "https://lato-positivo-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lato-positivo",
+      storageBucket: "lato-positivo.firebasestorage.app",
+      messagingSenderId: "967729753744",
+      appId: "1:967729753744:web:99f2cb5266c2b569d83215"
+    };
+
+    // 3. Inizializza Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+    const menuRef = dbRef(db, 'menu');
+
+    function initAdmin() {
+      const form = document.getElementById('add-form');
+      const menuList = document.getElementById('menu-list');
+
+      // Aggiungi un nuovo cocktail
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const nome = form.nome.value.trim();
+        const descrizione = form.descrizione.value.trim();
+        const prezzo = parseFloat(form.prezzo.value);
+        if (!nome || !descrizione || isNaN(prezzo)) {
+          return alert('Compila tutti i campi');
+        }
+        let immagineUrl = '';
+        const fileInput = document.getElementById('immagineFile');
+        const file = fileInput.files[0];
+        try {
+          if (file) {
+            const imgRef = storageRef(storage, `menu_images/${Date.now()}_${file.name}`);
+            await uploadBytes(imgRef, file);
+            immagineUrl = await getDownloadURL(imgRef);
+          }
+          const newRef = push(menuRef);
+          await set(newRef, { nome, descrizione, prezzo, immagine: immagineUrl });
+          alert('Cocktail aggiunto con successo!');
+          form.reset();
+        } catch (err) {
+          console.error(err);
+          alert('Errore durante l\'aggiunta');
+        }
+      });
+
+      // Mostra la lista dei cocktail e consenti eliminazione/modifica
+      onValue(menuRef, snapshot => {
+        menuList.innerHTML = '';
+        const data = snapshot.val() || {};
+        for (let id in data) {
+          const item = data[id];
+          const el = document.createElement('div');
+          el.innerHTML = `
+            <strong>${item.nome}</strong> - ${item.descrizione} - €${item.prezzo.toFixed(2)}<br>
+            ${item.immagine ? `<img src="${item.immagine}">` : ''}<br>
+            <button onclick="removeItem('${id}')">Elimina</button>
+            <button onclick="editItem('${id}', '${item.nome.replace(/'/g,"\\'")}', '${item.descrizione.replace(/'/g,"\\'")}', '${item.prezzo}', '${item.immagine}')">Modifica</button>
+          `;
+          menuList.appendChild(el);
+        }
+      });
+
+      // Elimina un cocktail
+      window.removeItem = id => remove(dbRef(db, 'menu/' + id));
+
+      // Modifica un cocktail
+      window.editItem = (id, nome, descrizione, prezzo, immagine) => {
+        const newNome = prompt("Modifica nome:", nome);
+        const newDesc = prompt("Modifica descrizione:", descrizione);
+        const newPrezzo = prompt("Modifica prezzo:", prezzo);
+        let newImg = immagine;
+
+        // Seleziona nuovo file per immagine
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+        fileInput.onchange = async () => {
+          const file = fileInput.files[0];
+          const imgRef = storageRef(storage, `menu_images/${Date.now()}_${file.name}`);
+          await uploadBytes(imgRef, file);
+          newImg = await getDownloadURL(imgRef);
+          applyUpdate();
+          document.body.removeChild(fileInput);
+        };
+        fileInput.click();
+
+        function applyUpdate() {
+          if (newNome && newDesc && !isNaN(parseFloat(newPrezzo))) {
+            update(dbRef(db, 'menu/' + id), {
+              nome: newNome,
+              descrizione: newDesc,
+              prezzo: parseFloat(newPrezzo),
+              immagine: newImg
+            });
+            alert('Cocktail aggiornato!');
+          }
+        }
+      };
+    }
+
+    // Controllo password e avvio pannello
+    window.checkPassword = () => {
+      const input = document.getElementById('admin-password').value;
+      if (input === 'positivoadmin') {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        initAdmin();
+      } else {
+        alert('Password errata');
+      }
+    };
+  </script>
+</body>
+</html>
